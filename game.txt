@@ -1,3 +1,18 @@
 Stellaris
 Paradox Interactive
-Strategy 1003 399.99 2016
+Strategy 1003 39.99 2016
+Plague Tale Innocence
+Focus Entertainment
+Story_Rich 39 39.99 2019
+Plague Tale Requiem
+Focus Entertainment
+Story_Rich 30 49.99 2022
+Palworld
+Pocketpair
+Creature_Collector 161 29.99 2024
+Armored Core VI Fires oF Rubicon
+From Software
+Mechs 49 59.99 2023
+Red Dead Redemption II
+Rockstar Games 
+Story_Rich 351 59.99 2018

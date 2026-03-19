@@ -1,6 +1,6 @@
 /**
  * @file game.cpp
- * @author Joseph Russell
+ * @author Joseph Russell, Zachery Pickell
  * @date 2026-03-19
  * @brief The implementation of game.h
  * 
@@ -8,214 +8,131 @@
  */
 
 #include <iostream>
-#include <string>
 #include <fstream>
+#include <sstream>
 #include <iomanip>
-#include <list>
 #include "game.h"
-
 
 using namespace std;
 
- 
-List::List() {
-    head = NULL;
+// Insert game in sorted order by title
+void Library::insert_sorted(const Game& newGame) {
+    auto it = games.begin();
+
+    while (it != games.end() && it->title < newGame.title) {
+        ++it;
+    }
+
+    games.insert(it, newGame);
 }
 
-void List::push_front(string fname, string lname, string phone) {
-    Node *insert = new Node;
-    insert -> next = NULL;
-    insert -> fname = fname;
-    insert -> lname = lname;
-    insert -> phoneNum = phone;
-
-    insert -> next = head;
-    head = insert;
-   
-}
-
-void List::push_back(string fname, string lname, string phone) {
-    Node *newGuy = new Node;
-    newGuy -> next = NULL;
-    newGuy -> fname = fname;
-    newGuy -> lname = lname;
-    newGuy -> phoneNum = phone;
-    newGuy -> name = fname + " " + lname;
-
-    //Case 1 list is empty
-    if (head == NULL) {
-        head = newGuy;
-        return;
-    }
-    //Case 2 list is !empty
-    else {
-        Node *tail = head;
-        while (tail -> next != NULL) {
-            tail = tail -> next;
-        }
-        tail -> next = newGuy;
-    }
-}
-
-void List::print(){
-    Node *printGuy;
-    printGuy = head;
-
-    while (printGuy != NULL) { //print until the end of the list
-        cout << printGuy -> fname << " " << printGuy -> lname << " (" << printGuy -> phoneNum << "), ";
-        printGuy = printGuy -> next;
-    }
-    cout << endl;
-}
-
-
-
-void List::delete_user(string name) {
-    Node *temp, *eraser;
-    
-    //Case 1: empty list
-    if (head == NULL) {
-        return; //nothing to do
-    }
-    //Case 2: value is at head of the list
-    else if (head -> fname == name) {
-        eraser = head;
-        head = head -> next;
-        delete eraser;
-    }
-    //Case 3: need to search and destroy
-    else {
-        temp = head;
-
-        while (temp -> next != NULL && temp -> next -> name != name) {
-            temp = temp -> next;
-        }
-
-        //if no such value
-        if (temp -> next == NULL) {
-            return; //nothing to do
-        }
-        eraser = temp -> next;
-        temp -> next = eraser -> next;
-        delete eraser;
-    }
-
-}
-
-List::~List() {
-    cout << "Destroying the list" << endl;
-    
-    //Not efficent
-    while (head != NULL) {
-        cout << "Removing list member: " << head -> fname << endl;
-        delete_user(head -> name);
-    }
-}
-
-void List::read_from_file(string filename) {
-    ifstream inFile;
-    string genre;
-    string publish;
-    string name;
-    float hours;
-    float price;
-    float year;
-
-    inFile.open(filename);
-    cout << "test";
+// Read games from file
+void Library::read_from_file(string filename) {
+    ifstream inFile(filename);
 
     if (!inFile) {
-        cout << "Unable to open file: " << filename << endl;
-        exit(1);
+        cout << "Unable to open file\n";
+        return;
     }
-    
-    // Read pairs: full name line, then phone line
-    while (getline(inFile, name)) {
-        if (getline(inFile, publish)) {
-            cin >> genre;
-            cin >> hours;
-            cin >> price;
-            cin >> year;
-            
-            insert_sorted(name, publish, genre, hours, price, year);
-        }
+
+    Game g;
+    string line;
+
+    while (getline(inFile, g.title)) {
+        getline(inFile, g.publisher);
+
+        // Read entire line with genre + numbers
+        getline(inFile, line);
+
+        // Parse it
+        stringstream os(line);
+        os >> g.genre >> g.hours >> g.price >> g.year;
+
+        insert_sorted(g);
     }
 
     inFile.close();
 }
 
-void List::write_to_file(string filename) {
 
-    string phoneNum;
-    string fname, lname;
-
-    ofstream outFile;
-    outFile.open(filename);
+// Write games to file
+void Library::write_to_file(string filename) {
+    ofstream outFile(filename);
 
     if (!outFile) {
-        cout << "Unable to open file: " << filename << endl;
-        exit(1);
+        cout << "Unable to open file\n";
+        return;
     }
-    Node *current = head;
-    while (current != NULL) {
-        outFile << current -> fname << " " << current -> lname << endl;
-        outFile << current -> phoneNum << endl;
-        current = current -> next;
+
+    for (const auto& g : games) {
+        outFile << g.title << endl;
+        outFile << g.publisher << endl;
+        outFile << g.genre << " "
+                << g.hours << " "
+                << g.price << " "
+                << g.year << endl;
     }
 
     outFile.close();
 }
 
-// sorted insertion by last name then first name; phone provided by user
-void List::insert_sorted(string fname, string lname, string phone, 
-                         float hours, float price, float year) {
-    Node *newGuy = new Node;
-    newGuy->next = NULL;
-    newGuy->fname = fname;
-    newGuy->lname = lname;
-    newGuy->phoneNum = phone;
-    newGuy->name = fname + " " + lname;
-
-    // empty list or new node sorts before head
-    if (head == NULL || lname < head->lname || 
-        (lname == head->lname && fname < head->fname)) {
-        newGuy->next = head;
-        head = newGuy;
-        return;
+// Print all games
+void Library::print_all() const {
+    for (const auto& g : games) {
+        cout << "Title: " << g.title << endl;
+        cout << "Publisher: " << g.publisher << endl;
+        cout << "Genre: " << g.genre << endl;
+        cout << "Hours Played: " << g.hours << endl;
+        cout << "Price: $" << fixed << setprecision(2) << g.price << endl;
+        cout << "Year: " << g.year << endl;
+        cout << "-----------------------------" << endl;
     }
-
-    Node *cur = head;
-    while (cur->next != NULL &&
-           (cur->next->lname < lname ||
-            (cur->next->lname == lname && cur->next->fname < fname))) {
-        cur = cur->next;
-    }
-
-    newGuy->next = cur->next;
-    cur->next = newGuy;
 }
 
-void List::find_genre(string genre) {
-   Node *cur = head;
-   while (cur != NULL) {
-       if (cur->fname == genre) {
-          // cout << "The phone number for " << fname << " " << lname << " is: " << cur->phoneNum << endl;
-           return;
-       }
-       cur = cur->next;
-   }
-   cout << "Genre not found: " << genre << endl;
+// Find all games of a specific genre
+void Library::find_genre(string genre) const {
+    bool found = false;
 
+    for (const auto& g : games) {
+        if (g.genre == genre) {
+            cout << g.title << " (" << g.year << ")" << endl;
+            found = true;
+        }
+    }
+
+    if (!found) {
+        cout << "No games found for genre: " << genre << endl;
+    }
 }
 
-void List::find_game(string name) {
-    Node *cur = head;
-    while (cur != NULL) {
-        if (cur->phoneNum == name) {
-            cout << "The contact with the phone number " << name << ": " << cur->fname << " " << cur->lname << endl;
+// Find games containing keyword in title
+void Library::find_game(string keyword) const {
+    bool found = false;
+
+    for (const auto& g : games) {
+        if (g.title.find(keyword) != string::npos) {
+            cout << "Title: " << g.title << endl;
+            cout << "Publisher: " << g.publisher << endl;
+            cout << "Year: " << g.year << endl;
+            cout << "-----------------------------" << endl;
+            found = true;
+        }
+    }
+
+    if (!found) {
+        cout << "No games found containing: " << keyword << endl;
+    }
+}
+
+// Remove a game by title and year
+void Library::remove_game(string title, int year) {
+    for (auto it = games.begin(); it != games.end(); ++it) {
+        if (it->title == title && it->year == year) {
+            games.erase(it);
+            cout << "Game removed successfully." << endl;
             return;
         }
-        cur = cur->next;
     }
-    cout << "Contact not found with that phone number: " << name << endl;
+
+    cout << "Game not found." << endl;
 }
