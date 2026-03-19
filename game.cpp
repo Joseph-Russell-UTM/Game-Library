@@ -70,7 +70,7 @@ void List::print(){
 
 
 
-void List::delete_user(string fname, string lname) {
+void List::delete_user(string name) {
     Node *temp, *eraser;
     
     //Case 1: empty list
@@ -78,7 +78,7 @@ void List::delete_user(string fname, string lname) {
         return; //nothing to do
     }
     //Case 2: value is at head of the list
-    else if (head -> fname == fname && head -> lname == lname) {
+    else if (head -> fname == name) {
         eraser = head;
         head = head -> next;
         delete eraser;
@@ -87,7 +87,7 @@ void List::delete_user(string fname, string lname) {
     else {
         temp = head;
 
-        while (temp -> next != NULL && temp -> next -> fname != fname && temp -> next -> lname != lname) {
+        while (temp -> next != NULL && temp -> next -> name != name) {
             temp = temp -> next;
         }
 
@@ -108,17 +108,21 @@ List::~List() {
     //Not efficent
     while (head != NULL) {
         cout << "Removing list member: " << head -> fname << endl;
-        delete_user(head -> fname, head -> lname);
+        delete_user(head -> name);
     }
 }
 
 void List::read_from_file(string filename) {
     ifstream inFile;
-    string fullName;
-    string phoneNum;
-    string fname, lname;
+    string genre;
+    string publish;
+    string name;
+    float hours;
+    float price;
+    float year;
 
     inFile.open(filename);
+    cout << "test";
 
     if (!inFile) {
         cout << "Unable to open file: " << filename << endl;
@@ -126,20 +130,14 @@ void List::read_from_file(string filename) {
     }
     
     // Read pairs: full name line, then phone line
-    while (getline(inFile, fullName)) {
-        if (getline(inFile, phoneNum)) {
-            // Separates full name into first and last name
-            size_t spacePos = fullName.find(' ');
-            if (spacePos != string::npos) {
-                fname = fullName.substr(0, spacePos);
-                lname = fullName.substr(spacePos + 1);
-                
-            } else {
-                fname = fullName;
-                lname = "";
-            }
+    while (getline(inFile, name)) {
+        if (getline(inFile, publish)) {
+            cin >> genre;
+            cin >> hours;
+            cin >> price;
+            cin >> year;
             
-            insert_sorted(fname, lname, phoneNum, hours, price, name);
+            insert_sorted(name, publish, genre, hours, price, year);
         }
     }
 
@@ -200,24 +198,24 @@ void List::insert_sorted(string fname, string lname, string phone,
 void List::find_genre(string genre) {
    Node *cur = head;
    while (cur != NULL) {
-       if (cur->fname == fname && cur->lname == lname) {
-           cout << "The phone number for " << fname << " " << lname << " is: " << cur->phoneNum << endl;
+       if (cur->fname == genre) {
+          // cout << "The phone number for " << fname << " " << lname << " is: " << cur->phoneNum << endl;
            return;
        }
        cur = cur->next;
    }
-   cout << "Contact not found: " << fname << " " << lname << endl;
+   cout << "Genre not found: " << genre << endl;
 
 }
 
 void List::find_game(string name) {
     Node *cur = head;
     while (cur != NULL) {
-        if (cur->phoneNum == phone) {
-            cout << "The contact with the phone number " << phone << ": " << cur->fname << " " << cur->lname << endl;
+        if (cur->phoneNum == name) {
+            cout << "The contact with the phone number " << name << ": " << cur->fname << " " << cur->lname << endl;
             return;
         }
         cur = cur->next;
     }
-    cout << "Contact not found with that phone number: " << phone << endl;
+    cout << "Contact not found with that phone number: " << name << endl;
 }

@@ -7,8 +7,8 @@
  * Creates the prototypes used in the code used in game.cpp.
  */
 
-#ifndef LIST_H
-#define LIST_H
+#ifndef GAME_H
+#define GAME_H
 
 #include <string>
 
