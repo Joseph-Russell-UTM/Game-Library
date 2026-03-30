@@ -105,7 +105,7 @@ void Library::find_genre(string genre) const {
     }
 }
 
-// Find games containing keyword in title
+// Find games containing the name given by the user.
 void Library::find_game(string keyword) const {
     bool found = false;
 

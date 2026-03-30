@@ -28,13 +28,25 @@ private:
     list<Game> games;
 
 public:
-    //Adds a new game
+    //Adds a new game and sorts the list
     void insert_sorted(const Game& newGame);
+
+    //Reads a file to a list
     void read_from_file(string filename);
+
+    //Writes the list into a file
     void write_to_file(string filename);
+
+    //Prints the list
     void print_all() const;
+
+    //Finds all games based on the genre
     void find_genre(string genre) const;
+
+    //Gives information on a game based off the name given bu the user,.
     void find_game(string keyword) const;
+
+    //Removes a game from the list.
     void remove_game(string title, int year);
 };
 
